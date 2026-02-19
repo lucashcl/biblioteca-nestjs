@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
 import { IsNull, Repository } from 'typeorm';
 import { Paginated, Pagination } from '../common/pagination/pagination';
-import { PaginationQueryDto } from '../common/pagination/pagination.dto';
+import { PaginationQueryDto } from '../common/pagination/pagination-query.dto';
 import { BookResponseDto } from './dto/book-response.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
@@ -29,9 +29,6 @@ export class BooksService {
     const [books, count] = await this.booksRepository.findAndCount({
       skip: offset,
       take: pageSize,
-      select: {
-        deletedAt: false,
-      },
       order: {
         updatedAt: 'DESC',
       },
@@ -74,7 +71,10 @@ export class BooksService {
     id: number,
     updateBookDto: UpdateBookDto,
   ): Promise<BookResponseDto | null> {
-    const book = await this.booksRepository.findOneBy({ id });
+    const book = await this.booksRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
     if (!book) {
       return null;
     }
@@ -84,7 +84,10 @@ export class BooksService {
   }
 
   async delete(id: number): Promise<BookResponseDto | null> {
-    const book = await this.booksRepository.findOneBy({ id });
+    const book = await this.booksRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
     if (!book) {
       return null;
     }
