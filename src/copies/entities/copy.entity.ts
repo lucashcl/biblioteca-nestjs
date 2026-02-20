@@ -2,33 +2,34 @@ import {
   Column,
   Entity,
   Index,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Copy } from '../../copies/entities/copy.entity';
+import { Book } from '../../books/entities/book.entity';
+
+const copyEnum = ['available', 'borrowed', 'lost'] as const;
+
+type CopyStatus = (typeof copyEnum)[number];
 
 @Entity({
-  name: 'books',
+  name: 'copies',
   orderBy: {
     updatedAt: 'DESC',
   },
 })
-export class Book {
+export class Copy {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  title: string;
-
+  @ManyToOne(() => Book, (book) => book.copies)
   @Index()
-  @Column()
-  author: string;
+  book: Book;
 
-  @Column({ unique: true })
-  isbn: string;
-
-  @OneToMany(() => Copy, (copy) => copy.book)
-  copies: Copy[];
+  @Column({
+    enum: copyEnum,
+  })
+  @Index()
+  status: CopyStatus;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
