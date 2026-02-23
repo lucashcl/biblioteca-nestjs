@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-export type ReaderStatus = (typeof Reader.status)[number];
+type ReaderStatus = (typeof Reader.status)[number];
 
 @Entity({
   name: 'readers',

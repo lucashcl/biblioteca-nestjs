@@ -3,7 +3,7 @@ import { Copy } from '../entities/copy.entity';
 export class CopyResponseDto {
   id: number;
   bookId: number;
-  status: 'available' | 'borrowed' | 'lost';
+  status: Copy['status'];
   createdAt: Date;
   updatedAt: Date;
 
