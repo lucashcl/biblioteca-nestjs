@@ -1,26 +1,84 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReaderDto } from './dto/create-reader.dto';
 import { UpdateReaderDto } from './dto/update-reader.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Reader } from './entities/reader.entity';
+import { IsNull, Repository } from 'typeorm';
+import { ReaderResponseDto } from './dto/reader-response.dto';
+import { Paginated, Pagination } from '../common/pagination/pagination';
+import { ReaderQueryDto } from './dto/reader-query.dto';
 
 @Injectable()
 export class ReadersService {
-  create(createReaderDto: CreateReaderDto) {
-    return 'This action adds a new reader';
+  constructor(
+    @InjectRepository(Reader)
+    private readersRepository: Repository<Reader>,
+  ) {}
+  async create(createReaderDto: CreateReaderDto): Promise<ReaderResponseDto> {
+    const reader = this.readersRepository.create(createReaderDto);
+    const saved = await this.readersRepository.save(reader);
+    return ReaderResponseDto.fromEntity(saved);
   }
 
-  findAll() {
-    return `This action returns all readers`;
+  async findAll({
+    page,
+    pageSize,
+    status,
+  }: ReaderQueryDto): Promise<Paginated<ReaderResponseDto>> {
+    const offset = Pagination.calculateOffset(page, pageSize);
+    const [readers, count] = await this.readersRepository.findAndCount({
+      skip: offset,
+      take: pageSize,
+      order: {
+        updatedAt: 'DESC',
+      },
+      where: {
+        deletedAt: IsNull(),
+        status: status,
+      },
+    });
+
+    return Pagination.create({
+      data: readers.map((reader) => ReaderResponseDto.fromEntity(reader)),
+      page,
+      pageSize,
+      totalItems: count,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} reader`;
+  async findOne(id: number) {
+    const reader = await this.readersRepository.findOne({
+      where: {
+        id,
+        deletedAt: IsNull(),
+      },
+    });
+    return reader ? ReaderResponseDto.fromEntity(reader) : null;
   }
 
-  update(id: number, updateReaderDto: UpdateReaderDto) {
-    return `This action updates a #${id} reader`;
+  async update(id: number, updateReaderDto: UpdateReaderDto) {
+    const reader = await this.readersRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+    if (!reader) {
+      return null;
+    }
+    this.readersRepository.merge(reader, updateReaderDto);
+    const updated = await this.readersRepository.save(reader);
+    return ReaderResponseDto.fromEntity(updated);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} reader`;
+  async remove(id: number) {
+    const reader = await this.readersRepository.findOneBy({
+      id,
+      deletedAt: IsNull(),
+    });
+    if (!reader) {
+      return null;
+    }
+    reader.deletedAt = new Date();
+    const deleted = await this.readersRepository.save(reader);
+    return ReaderResponseDto.fromEntity(deleted);
   }
 }
