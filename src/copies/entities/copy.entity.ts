@@ -7,9 +7,7 @@ import {
 } from 'typeorm';
 import { Book } from '../../books/entities/book.entity';
 
-const copyEnum = ['available', 'borrowed', 'lost'] as const;
-
-type CopyStatus = (typeof copyEnum)[number];
+type CopyStatus = (typeof Copy.status)[number];
 
 @Entity({
   name: 'copies',
@@ -18,6 +16,11 @@ type CopyStatus = (typeof copyEnum)[number];
   },
 })
 export class Copy {
+  public static readonly status = [
+    'available',
+    'borrowed',
+    'reserved',
+  ] as const;
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,7 +29,7 @@ export class Copy {
   book: Book;
 
   @Column({
-    enum: copyEnum,
+    enum: Copy.status,
   })
   @Index()
   status: CopyStatus;
