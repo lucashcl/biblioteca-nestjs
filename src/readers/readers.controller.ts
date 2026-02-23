@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  NotFoundException,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ReadersService } from './readers.service';
 import { CreateReaderDto } from './dto/create-reader.dto';
 import { UpdateReaderDto } from './dto/update-reader.dto';
+import { ReaderQueryDto } from './dto/reader-query.dto';
 
 @Controller('readers')
 export class ReadersController {
   constructor(private readonly readersService: ReadersService) {}
 
   @Post()
-  create(@Body() createReaderDto: CreateReaderDto) {
-    return this.readersService.create(createReaderDto);
+  async create(@Body() createReaderDto: CreateReaderDto) {
+    return await this.readersService.create(createReaderDto);
   }
 
   @Get()
-  findAll() {
-    return this.readersService.findAll();
+  async findAll(@Query() ReaderQueryDto: ReaderQueryDto) {
+    return await this.readersService.findAll(ReaderQueryDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.readersService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const reader = await this.readersService.findOne(id);
+    if (!reader) throw new NotFoundException(`Reader with id ${id} not found`);
+    return reader;
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReaderDto: UpdateReaderDto) {
-    return this.readersService.update(+id, updateReaderDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateReaderDto: UpdateReaderDto,
+  ) {
+    const reader = await this.readersService.update(id, updateReaderDto);
+    if (!reader) throw new NotFoundException(`Reader with id ${id} not found`);
+    return reader;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.readersService.remove(+id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const reader = await this.readersService.remove(id);
+    if (!reader) throw new NotFoundException(`Reader with id ${id} not found`);
+    return reader;
   }
 }
