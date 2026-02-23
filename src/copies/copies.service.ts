@@ -79,7 +79,10 @@ export class CopiesService {
     if (!copy) {
       return null;
     }
-    this.copiesRepository.merge(copy, updateCopyDto);
+    this.copiesRepository.merge(copy, {
+      ...updateCopyDto,
+      updatedAt: new Date(),
+    });
     const saved = await this.copiesRepository.save(copy);
     return CopyResponseDto.fromEntity(saved);
   }

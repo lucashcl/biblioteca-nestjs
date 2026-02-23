@@ -77,7 +77,10 @@ export class BooksService {
     if (!book) {
       return null;
     }
-    this.booksRepository.merge(book, updateBookDto);
+    this.booksRepository.merge(book, {
+      ...updateBookDto,
+      updatedAt: new Date(),
+    });
     const updated = await this.booksRepository.save(book);
     return BookResponseDto.fromEntity(updated);
   }

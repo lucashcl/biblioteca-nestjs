@@ -64,7 +64,10 @@ export class ReadersService {
     if (!reader) {
       return null;
     }
-    this.readersRepository.merge(reader, updateReaderDto);
+    this.readersRepository.merge(reader, {
+      ...updateReaderDto,
+      updatedAt: new Date(),
+    });
     const updated = await this.readersRepository.save(reader);
     return ReaderResponseDto.fromEntity(updated);
   }
