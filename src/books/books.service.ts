@@ -15,7 +15,6 @@ export class BooksService {
     private booksRepository: Repository<Book>,
   ) {}
   async create(createBookDto: CreateBookDto): Promise<BookResponseDto> {
-    // ISBN unique
     const book = this.booksRepository.create(createBookDto);
     const saved = await this.booksRepository.save(book);
     return BookResponseDto.fromEntity(saved);
