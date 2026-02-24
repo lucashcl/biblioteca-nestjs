@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Loan } from '../../loans/entities/loan.entity';
 
 type ReaderStatus = (typeof Reader.status)[number];
 
@@ -27,6 +28,9 @@ export class Reader {
 
   @Column({ enum: Reader.status, default: 'active' })
   status: ReaderStatus;
+
+  @OneToMany(() => Loan, (loan) => loan.reader)
+  loans: Loan[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

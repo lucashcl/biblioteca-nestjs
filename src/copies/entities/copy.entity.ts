@@ -3,9 +3,11 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Book } from '../../books/entities/book.entity';
+import { Loan } from '../../loans/entities/loan.entity';
 
 type CopyStatus = (typeof Copy.status)[number];
 
@@ -24,15 +26,18 @@ export class Copy {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Book, (book) => book.copies)
-  @Index()
-  book: Book;
-
   @Column({
     enum: Copy.status,
   })
   @Index()
   status: CopyStatus;
+
+  @ManyToOne(() => Book, (book) => book.copies)
+  @Index()
+  book: Book;
+
+  @OneToMany(() => Loan, (loan) => loan.copy)
+  loans: Loan[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
