@@ -9,6 +9,7 @@ import { Reader } from '../../readers/entities/reader.entity';
   },
 })
 export class Loan {
+  public static readonly status = ['active', 'overdue', 'returned'] as const;
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,14 +19,24 @@ export class Loan {
   @ManyToOne(() => Reader, (reader) => reader.loans)
   reader: Reader;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   loanedAt: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   dueDate: Date;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   returnedAt: Date | null = null;
+
+  getStatus(now: Date = new Date()): (typeof Loan.status)[number] {
+    if (this.returnedAt) {
+      return 'returned';
+    }
+    if (this.dueDate < now) {
+      return 'overdue';
+    }
+    return 'active';
+  }
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
