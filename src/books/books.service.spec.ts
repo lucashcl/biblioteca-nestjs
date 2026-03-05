@@ -3,11 +3,6 @@ import { BooksService } from './books.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Book } from './entities/book.entity';
 
-/**
- * O que eu quero testar?
- * - ISBN único
- */
-
 describe('BooksService', () => {
   let service: BooksService;
 
