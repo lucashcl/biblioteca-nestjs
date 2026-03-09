@@ -1,34 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Query,
+} from '@nestjs/common';
 import { LoansService } from './loans.service';
-import { CreateLoanDto } from './dto/create-loan.dto';
-import { UpdateLoanDto } from './dto/update-loan.dto';
+import { LoanQueryDto } from './dto/loan-query.dto';
+import { BorrowCopyDto } from './dto/borrow-copy.dto';
+import { ReturnCopyDto } from './dto/return-copy.dto';
 
 @Controller('loans')
 export class LoansController {
   constructor(private readonly loansService: LoansService) {}
 
-  @Post()
-  create(@Body() createLoanDto: CreateLoanDto) {
-    return this.loansService.create(createLoanDto);
+  @Post('borrow')
+  async borrow(@Body() BorrowCopyDto: BorrowCopyDto) {
+    return await this.loansService.borrow(BorrowCopyDto);
+  }
+
+  @Post(':id/return')
+  async return(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() returnCopyDto: ReturnCopyDto,
+  ) {
+    return await this.loansService.return(id, returnCopyDto);
   }
 
   @Get()
-  findAll() {
-    return this.loansService.findAll();
+  async findAll(@Query() loanQueryDto: LoanQueryDto) {
+    return await this.loansService.findAll(loanQueryDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.loansService.findOne(+id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.loansService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLoanDto: UpdateLoanDto) {
-    return this.loansService.update(+id, updateLoanDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.loansService.remove(+id);
+  @Delete(':id/cancel')
+  async cancel(@Param('id', ParseIntPipe) id: number) {
+    return await this.loansService.cancel(id);
   }
 }
