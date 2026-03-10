@@ -19,6 +19,9 @@ import { LoansModule } from './loans/loans.module';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    RedisModule.forRoot({
+      config: { url: process.env.REDIS_URL },
+    }),
     BooksModule,
     CopiesModule,
     ReadersModule,
