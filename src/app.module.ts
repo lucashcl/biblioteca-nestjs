@@ -7,6 +7,7 @@ import { BooksModule } from './books/books.module';
 import { CopiesModule } from './copies/copies.module';
 import { ReadersModule } from './readers/readers.module';
 import { LoansModule } from './loans/loans.module';
+import { UsersModule } from './users/users.module';
 import { RedisModule } from '@nestjs-labs/nestjs-ioredis';
 
 @Module({
@@ -23,6 +24,7 @@ import { RedisModule } from '@nestjs-labs/nestjs-ioredis';
     RedisModule.forRoot({
       config: { url: process.env.REDIS_URL },
     }),
+    UsersModule,
     BooksModule,
     CopiesModule,
     ReadersModule,
