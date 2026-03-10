@@ -20,6 +20,10 @@ export class Duration {
     return this._milliseconds;
   }
 
+  get seconds() {
+    return this._milliseconds / 1000;
+  }
+
   toDateFrom(date: Date) {
     return new Date(date.getTime() + this._milliseconds);
   }
