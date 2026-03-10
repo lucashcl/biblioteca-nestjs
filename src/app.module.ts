@@ -7,6 +7,7 @@ import { BooksModule } from './books/books.module';
 import { CopiesModule } from './copies/copies.module';
 import { ReadersModule } from './readers/readers.module';
 import { LoansModule } from './loans/loans.module';
+import { RedisModule } from '@nestjs-labs/nestjs-ioredis';
 
 @Module({
   imports: [
