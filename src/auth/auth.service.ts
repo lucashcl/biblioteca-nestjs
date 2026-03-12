@@ -11,11 +11,12 @@ import { RedisService } from '@nestjs-labs/nestjs-ioredis';
 import { JwtService } from '@nestjs/jwt';
 import argon from 'argon2';
 import { Duration } from '../common/utils/duration';
+import { TokensResponseDto } from './dtos/tokens-response.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   private readonly redis: Redis;
-  public static TokenDuration = Duration.fromDays(7);
+  public static readonly TokenDuration = Duration.fromDays(7);
   private readonly logger = new Logger(AuthService.name, { timestamp: true });
   constructor(
     private redisService: RedisService,
@@ -57,11 +58,13 @@ export class AuthService implements OnModuleInit {
     return user;
   }
 
-  private async generateTokens(user: { id: number }) {
+  private async generateTokens(user: {
+    id: number;
+  }): Promise<TokensResponseDto> {
     const jti = crypto.randomUUID();
     const exp = AuthService.TokenDuration.seconds;
     await this.redis.set(`rt:${jti}`, String(user.id), 'EX', exp);
-    return {
+    const TokensResponse: TokensResponseDto = {
       accessToken: this.jwtService.sign(
         { sub: user.id, typ: 'access' },
         { expiresIn: Duration.fromHours(1).seconds },
@@ -71,6 +74,7 @@ export class AuthService implements OnModuleInit {
         { expiresIn: AuthService.TokenDuration.seconds },
       ),
     };
+    return TokensResponse;
   }
 
   async login(email: string, password: string) {
