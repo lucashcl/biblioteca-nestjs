@@ -1,98 +1,90 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Biblioteca API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Projeto criado com a finalidade de aprender mais sobre o NestJS por meio da construção de uma API de gerenciamento de biblioteca. A aplicação cobre autenticação, cadastro de livros e leitores, controle de exemplares e fluxo de empréstimos e devoluções.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tecnologias usadas
 
-## Description
+- NestJS
+- Docker
+- PostgreSQL
+- Redis
+- TypeORM
+- JWT
+- Swagger/Scalar para documentação da API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Visão geral
 
-## Project setup
+A API expõe recursos para:
 
-```bash
-$ npm install
-```
+- autenticação com access token e refresh token
+- gerenciamento de livros
+- gerenciamento de exemplares de cada livro
+- gerenciamento de leitores
+- controle de empréstimos, devoluções e cancelamentos
 
-## Compile and run the project
+Documentação interativa da API: `/docs`
 
-```bash
-# development
-$ npm run start
+## Endpoints
 
-# watch mode
-$ npm run start:dev
+### Públicos
 
-# production mode
-$ npm run start:prod
-```
+- `GET /`: retorna uma mensagem simples de disponibilidade da aplicação
+- `POST /auth/login`: autentica um usuário com email e senha
 
-## Run tests
+### Autenticação
 
-```bash
-# unit tests
-$ npm run test
+- `POST /auth/refresh`: gera um novo par de tokens usando o refresh token enviado no header `Authorization`
+- `POST /auth/logout`: invalida o refresh token atual
 
-# e2e tests
-$ npm run test:e2e
+### Livros
 
-# test coverage
-$ npm run test:cov
-```
+- `POST /books`: cria um livro
+- `GET /books`: lista livros com paginação
+- `GET /books/:id`: busca um livro por id
+- `GET /books/isbn/:isbn`: busca um livro por ISBN
+- `PATCH /books/:id`: atualiza um livro
+- `DELETE /books/:id`: remove logicamente um livro
 
-## Deployment
+### Exemplares
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- `POST /books/:bookId/copies`: cria uma quantidade de exemplares para um livro
+- `GET /books/:bookId/copies`: lista os exemplares de um livro, com suporte a paginação e filtro por status
+- `GET /books/:bookId/copies/:id`: busca um exemplar específico de um livro
+- `PATCH /books/:bookId/copies/:id`: atualiza um exemplar
+- `DELETE /books/:bookId/copies/:id`: remove logicamente um exemplar
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Leitores
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- `POST /readers`: cria um leitor
+- `GET /readers`: lista leitores com paginação e filtro por status
+- `GET /readers/:id`: busca um leitor por id
+- `PATCH /readers/:id`: atualiza um leitor
+- `DELETE /readers/:id`: remove logicamente um leitor
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Empréstimos
 
-## Resources
+- `POST /loans/borrow`: realiza o empréstimo de um exemplar para um leitor
+- `POST /loans/:id/return`: registra a devolução de um empréstimo
+- `GET /loans`: lista empréstimos com paginação
+- `GET /loans/:id`: busca um empréstimo por id
+- `DELETE /loans/:id/cancel`: cancela um empréstimo ativo
 
-Check out a few resources that may come in handy when working with NestJS:
+## Regras de negócio
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- Todas as rotas são protegidas por autenticação, exceto `GET /` e `POST /auth/login`.
+- A autenticação usa JWT com access token e refresh token.
+- Os refresh tokens são armazenados no Redis e invalidados em operações de refresh e logout.
+- Um usuário administrador inicial é criado automaticamente ao iniciar a aplicação, desde que `ADMIN_EMAIL` e `ADMIN_PASSWORD` estejam definidos nas variáveis de ambiente.
+- O empréstimo só pode ser realizado se o exemplar estiver com status `available`.
+- Cada empréstimo tem duração padrão de 14 dias.
+- Um leitor pode ter no máximo 5 empréstimos ativos ao mesmo tempo.
+- Um leitor com empréstimo em atraso não pode realizar novos empréstimos.
+- Ao devolver um livro após ultrapassar a data de vencimento em mais de 7 dias de tolerância, o leitor é suspenso automaticamente.
+- A remoção de livros, exemplares, leitores e empréstimos cancelados é lógica, usando marcação de exclusão em vez de exclusão física.
+- Ao emprestar um exemplar, seu status muda para `borrowed`.
+- Ao devolver ou cancelar um empréstimo ativo, o exemplar volta para `available`.
+- A reversão de suspensão do leitor é manual.
 
-## Support
+## Considerações
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Esta aplicação usa o fuso horário do computador para operações essenciais, como aplicação de suspensões e validação de empréstimos.
